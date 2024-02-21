@@ -1,0 +1,42 @@
+﻿@model IEnumerable<TargetAPI_Web.Models.Dto.TargetAPIDto>
+<br />
+<div class="container p-4 border">
+	<div class="row pb-2">
+		<div class="col">
+			<h1 class ="text-primary">TargetApi List</h1>
+		</div>
+		<div class ="col text-end pt-1">
+			<a asp-controller="TargetAPI" asp-action="CreateTargetAPI" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i>Create New TargetApi</a>
+		</div>
+	</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					Name
+				</th>
+				<th>
+					Url
+				</th>
+				<th>
+					MonitoringInterval
+				</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach(var item in Model)
+			{
+				<tr>
+					<td>@item.Name</td>
+					<td>@item.Url</td>
+					<td>@item.MonitoringInterval</td>
+					<td>
+						<a asp-controller="TargetAPI" asp-action="UpdateTargetAPI" asp-route-id="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="TargetAPI" asp-action="DeleteTargetAPI" asp-route-id="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>

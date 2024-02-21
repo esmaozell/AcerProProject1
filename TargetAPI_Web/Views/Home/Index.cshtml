@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Components
+@model IEnumerable<TargetAPI_Web.Models.Dto.TargetAPIDto>
+
+<img class="d-block w-100" src="~/images/doga.jpg" nalt="" />
+<hr />
+<div class="row" style="--bs-gutter-x: 0;">
+    @foreach (var targetApi in Model)
+    {
+        <div class="col-md-6">
+            <div class="p-4">
+                <div class="row" style="border-radius: 20px; border: 1px solid #ffffff;">
+                    <div class="col-4">
+                        <img class="d-block w-100" style="border-radius: 20px;" src="~/images/doga.jpg" alt="First Slide" />
+                    </div>
+                    <div class="col-8">
+                        <p class="card-title text-warning" style="font-size: xx-large;">@targetApi.Name</p>
+                        <p class="card-text">@((MarkupString)targetApi.Url)</p>
+                    </div>
+                    <div class="col-12">
+                        <div class="row pb-3 pt-2">
+                            <div class="col-4">
+                                <a href="@Url.Action("IndexTargetAPI", "TargetAPI")" class="btn btn-success form-control btn-block">Look</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

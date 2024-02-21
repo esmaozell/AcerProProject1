@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace AcerProProject1.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/TargetAPI")]
     [ApiController]
     public class TargetAPIController : ControllerBase
     {
@@ -50,7 +50,7 @@ namespace AcerProProject1.Controllers
             return response;
         }
 
-        [HttpGet("GetTargetAPI", Name = "GetTargetAPI")]
+        [HttpGet("{id:int}", Name = "GetTargetAPI")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

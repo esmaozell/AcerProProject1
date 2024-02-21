@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcerProProject1", "AcerProProject1\AcerProProject1.csproj", "{B4371F78-B26E-48B7-A50F-F3BFA52E2906}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AcerProProject1", "AcerProProject1\AcerProProject1.csproj", "{B4371F78-B26E-48B7-A50F-F3BFA52E2906}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TargetAPI_Web", "TargetAPI_Web\TargetAPI_Web.csproj", "{70834A6D-BDE5-4AAD-96F8-F52E92C3AA6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TargetAPI_Utility", "TargetAPI_Utility\TargetAPI_Utility.csproj", "{3AB12FED-59D6-43AF-A896-9DF662E1901F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{B4371F78-B26E-48B7-A50F-F3BFA52E2906}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4371F78-B26E-48B7-A50F-F3BFA52E2906}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4371F78-B26E-48B7-A50F-F3BFA52E2906}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70834A6D-BDE5-4AAD-96F8-F52E92C3AA6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70834A6D-BDE5-4AAD-96F8-F52E92C3AA6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70834A6D-BDE5-4AAD-96F8-F52E92C3AA6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70834A6D-BDE5-4AAD-96F8-F52E92C3AA6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AB12FED-59D6-43AF-A896-9DF662E1901F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AB12FED-59D6-43AF-A896-9DF662E1901F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AB12FED-59D6-43AF-A896-9DF662E1901F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AB12FED-59D6-43AF-A896-9DF662E1901F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
