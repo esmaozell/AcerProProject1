@@ -1,8 +1,11 @@
 using AcerProProject1;
 using AcerProProject1.Data;
+using AcerProProject1.Models;
 using AcerProProject1.Repository;
 using AcerProProject1.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,11 +24,31 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
 });
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddResponseCaching();
 builder.Services.AddScoped<ITargetAPIRepository, TargetAPIRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
-
+builder.Services.AddApiVersioning(options => {
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+});
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
 var key = builder.Configuration.GetValue<string>("ApiSettings:Secret");
+builder.Services.AddControllers(option =>
+{
+    option.CacheProfiles.Add("Default30",
+        new CacheProfile()
+        {
+            Duration = 30
+        });
+});
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -80,25 +103,8 @@ options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1.0",
-        Title = "Magic Villa V1",
-        Description = "API to manage Villa",
-        TermsOfService = new Uri("https://example.com/terms"),
-        Contact = new OpenApiContact
-        {
-            Name = "Dotnetmastery",
-            Url = new Uri("https://dotnetmastery.com")
-        },
-        License = new OpenApiLicense
-        {
-            Name = "Example License",
-            Url = new Uri("https://example.com/license")
-        }
-    });
-    options.SwaggerDoc("v2", new OpenApiInfo
-    {
-        Version = "v2.0",
-        Title = "Magic Villa V2",
-        Description = "API to manage Villa",
+        Title = "Target API V1",
+        Description = "API to manage TARGETAPI",
         TermsOfService = new Uri("https://example.com/terms"),
         Contact = new OpenApiContact
         {
@@ -121,7 +127,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+   
 }
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -4,6 +4,7 @@ using AcerProProject1.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
+
 namespace AcerProProject1.Controllers
 {
 
@@ -60,5 +61,12 @@ namespace AcerProProject1.Controllers
             _response.IsSuccess = true;
             return Ok(_response);
         }
+        [HttpPost("register2")]
+        public async Task<IActionResult> Register2([FromBody] RegisterationRequestDto model)
+        {
+           
+            return Ok(_response);
+        }
     }
 }
+

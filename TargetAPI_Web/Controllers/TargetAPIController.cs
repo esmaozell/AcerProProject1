@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using TargetAPI_Utility;
 using TargetAPI_Web.Models;
 using TargetAPI_Web.Models.Dto;
 using TargetAPI_Web.Services.IServices;
@@ -22,7 +23,7 @@ namespace TargetAPI_Web.Controllers
         {
             List<TargetAPIDto> list = new();
 
-            var response = await targetAPIService.GetAllAsync<APIResponse>();
+            var response = await targetAPIService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
 
             if (response != null && response.IsSuccess)
             {
@@ -41,7 +42,7 @@ namespace TargetAPI_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await targetAPIService.CreateAsync<APIResponse>(model);
+                var response = await targetAPIService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "TargetAPI created successfully";
@@ -54,7 +55,7 @@ namespace TargetAPI_Web.Controllers
 
         public async Task<IActionResult> UpdateTargetAPI(int id)
         {
-            var response = await targetAPIService.GetAsync<APIResponse>(id);
+            var response = await targetAPIService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TargetAPIDto model = JsonConvert.DeserializeObject<TargetAPIDto>(Convert.ToString(response.Result));
@@ -68,7 +69,7 @@ namespace TargetAPI_Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var response = await targetAPIService.UpdateAsync<APIResponse>(model);
+                var response = await targetAPIService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
                 if (response != null && response.IsSuccess)
                 {
                     TempData["success"] = "TargetAPI updated successfully";
@@ -81,7 +82,7 @@ namespace TargetAPI_Web.Controllers
 
         public async Task<IActionResult> DeleteTargetAPI(int id)
         {
-            var response = await targetAPIService.GetAsync<APIResponse>(id);
+            var response = await targetAPIService.GetAsync<APIResponse>(id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TargetAPIDto model = JsonConvert.DeserializeObject<TargetAPIDto>(Convert.ToString(response.Result));
@@ -93,7 +94,7 @@ namespace TargetAPI_Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTargetAPI(TargetAPIDto model)
         {
-            var response = await targetAPIService.DeleteAsync<APIResponse>(model.Id);
+            var response = await targetAPIService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 TempData["success"] = "TargetAPI deleted successfully";

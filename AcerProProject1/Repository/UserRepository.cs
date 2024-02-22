@@ -2,6 +2,8 @@
 using AcerProProject1.Models;
 using AcerProProject1.Models.Dto;
 using AcerProProject1.Repository.IRepository;
+using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,16 +14,21 @@ namespace AcerProProject1.Repository
     public class UserRepository:IUserRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
         private string secretKey;
-        public UserRepository(ApplicationDbContext context,IConfiguration configuration)
+        public UserRepository(ApplicationDbContext context,IConfiguration configuration,
+            UserManager<ApplicationUser> userManager,IMapper mapper)
         {
             _context = context;
+            _userManager = userManager;
+            _mapper = mapper;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
         }
 
         public bool IsUniqueUser(string username)
         {
-            var user = _context.LocalUsers.FirstOrDefault(x => x.UserName == username);
+            var user = _context.ApplicationUsers.FirstOrDefault(x => x.UserName == username);
 
             if (user == null)
             {
@@ -33,7 +40,7 @@ namespace AcerProProject1.Repository
 
         public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
         {
-            var user = _context.LocalUsers.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDto.UserName.ToLower() &&
+              var user = _context.LocalUsers.FirstOrDefault(u => u.UserName.ToLower() == loginRequestDto.UserName.ToLower() &&
             u.Password == loginRequestDto.Password);
             if (user == null)
             {
@@ -65,6 +72,7 @@ namespace AcerProProject1.Repository
             };
 
             return loginResponseDto;
+
 
         }
 

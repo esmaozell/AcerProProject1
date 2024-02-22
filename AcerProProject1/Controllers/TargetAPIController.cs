@@ -29,7 +29,7 @@ namespace AcerProProject1.Controllers
         }
 
         [HttpGet("GetTargetAPIs")]
-        [Authorize]
+        [ResponseCache(CacheProfileName = "Default30")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetTargetAPIs()
         {
@@ -51,11 +51,12 @@ namespace AcerProProject1.Controllers
             }
             return response;
         }
-        [Authorize(Roles ="admin")]
+  
         [HttpGet("{id:int}", Name = "GetTargetAPI")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ResponseCache(Location = ResponseCacheLocation.None,NoStore = true)]
         public async Task<ActionResult<APIResponse>> GetTargetAPI(int id)
         {
             try
@@ -133,7 +134,6 @@ namespace AcerProProject1.Controllers
         }
 
         [HttpDelete("{id:int}", Name = "DeleteTargetAPI")]
-        [Authorize(Roles = "CUSTOM")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
