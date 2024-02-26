@@ -1,12 +1,6 @@
 ﻿using AcerProProject1.Data;
-using AcerProProject1.Models;
-using AcerProProject1.Repository.IRepository;
-using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
-
-
-
 
 public class WebsiteMonitor : BackgroundService
 {
