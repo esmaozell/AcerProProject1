@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AcerProProject1", "AcerProP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TargetAPI_Web", "TargetAPI_Web\TargetAPI_Web.csproj", "{70834A6D-BDE5-4AAD-96F8-F52E92C3AA6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TargetAPI_Utility", "TargetAPI_Utility\TargetAPI_Utility.csproj", "{3AB12FED-59D6-43AF-A896-9DF662E1901F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TargetAPI_Utility", "TargetAPI_Utility\TargetAPI_Utility.csproj", "{3AB12FED-59D6-43AF-A896-9DF662E1901F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

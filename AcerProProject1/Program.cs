@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,17 +73,18 @@ builder.Services.AddControllers(option =>
 }).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<WebsiteMonitor>();
 builder.Services.AddSwaggerGen(options => {
-options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-{
-    Description =
-        "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
-        "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
-        "Example: \"Bearer 12345abcdef\"",
-    Name = "Authorization",
-    In = ParameterLocation.Header,
-    Scheme = "Bearer"
-});
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description =
+            "JWT Authorization header using the Bearer scheme. \r\n\r\n " +
+            "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
+            "Example: \"Bearer 12345abcdef\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Scheme = "Bearer"
+    });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
@@ -119,7 +122,6 @@ options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     });
 });
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -127,14 +129,31 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-   
 }
-
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Start the WebsiteMonitor background service
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+    var logger = loggerFactory.CreateLogger<Program>();
+    var websiteMonitor = services.GetRequiredService<WebsiteMonitor>();
+
+    try
+    {
+        logger.LogInformation("Starting the WebsiteMonitor background service.");
+        await websiteMonitor.StartAsync(CancellationToken.None);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while starting the WebsiteMonitor background service.");
+    }
+}
 
 app.Run();

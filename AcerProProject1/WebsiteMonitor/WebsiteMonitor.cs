@@ -1,67 +1,115 @@
 ﻿using AcerProProject1.Data;
 using AcerProProject1.Models;
-using MailKit.Net.Smtp;
+using AcerProProject1.Repository.IRepository;
+using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 
-public class WebsiteMonitor
-{
-    private readonly ApplicationDbContext dbContext;
-    private static readonly HttpClient HttpClient = new HttpClient();
-    private static Timer _timer;
-    private static readonly string Email = "mail@example.com";
 
-    public WebsiteMonitor(ApplicationDbContext dbContext)
+
+
+public class WebsiteMonitor : BackgroundService
+{
+    private readonly ILogger<WebsiteMonitor> _logger;
+    private readonly ApplicationDbContext _dbContext;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly HttpClient _httpClient;
+
+    public WebsiteMonitor(ILogger<WebsiteMonitor> logger, ApplicationDbContext dbContext, IServiceProvider serviceProvider)
     {
-        this.dbContext = dbContext;
+        _logger = logger;
+        _dbContext = dbContext;
+        _serviceProvider = serviceProvider;
+        _httpClient = new HttpClient();
     }
 
-    public async Task StartMonitoring()
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var targetApps = await dbContext.TargetApis.ToListAsync();
-        foreach (var targetApp in targetApps)
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _timer = new Timer(CheckTargetApp, targetApp, TimeSpan.Zero, TimeSpan.FromSeconds(targetApp.MonitoringInterval));
+            using var scope = _serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var targetApps = await dbContext.TargetApis
+                .Select(t => new
+                {
+                    Url = t.Url,
+                    MonitoringInterval = t.MonitoringInterval
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var app in targetApps)
+            {
+                var url = app.Url;
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                {
+                    url = "https://" + url;
+                }
+
+                try
+                {
+
+                    if (string.IsNullOrEmpty(url))
+                    {
+                        Console.WriteLine("URL is empty or null.");
+                        return;
+                    }
+
+                    var client = new HttpClient();
+                    var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    var response = await client.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+                    Console.WriteLine(await response.Content.ReadAsStringAsync());
+                }
+                catch (HttpRequestException ex)
+                {
+
+                    SendEmail("Target app is down!", $"The target app {url} could not be reached.");
+                    _logger.LogInformation($"[{DateTime.Now}] {url} is down.");
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+                
+                await Task.Delay(TimeSpan.FromMinutes(app.MonitoringInterval), stoppingToken);
+            }
         }
     }
 
-    private async void CheckTargetApp(object state)
+    public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        var targetApp = (TargetAPI)state;
+        _httpClient.Dispose();
+        await base.StopAsync(cancellationToken);
+    }
+
+    private void SendEmail(string subject, string body)
+    {
         try
         {
-            HttpResponseMessage response = await HttpClient.GetAsync(targetApp.Url);
-            if (!response.IsSuccessStatusCode)
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Mailkit", "mailkitforacer@gmail.com"));
+            message.To.Add(new MailboxAddress("Ben", "arianaswan003@gmail.com"));
+            message.Subject = subject;
+            message.Body = new TextPart("plain")
             {
-                await SendEmail(Email, $"Target app {targetApp.Url} is down!", $"The target app {targetApp.Url} returned status code {response.StatusCode}");
+                Text = body
+            };
+
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
+            {
+                client.Connect("smtp.gmail.com", 587, false);
+                client.Authenticate("mailkitforacer@gmail.com", "a.A123456");
+                client.Send(message);
+                client.Disconnect(true);
+                Console.WriteLine("E-posta başarıyla gönderildi.");
             }
-            Console.WriteLine($"[{DateTime.Now}] {targetApp.Url} is up and running.");
         }
-        catch (HttpRequestException)
+        catch (Exception ex)
         {
-            await SendEmail(Email, $"Target app {targetApp.Url} is down!", $"The target app {targetApp.Url} could not be reached.");
-            Console.WriteLine($"[{DateTime.Now}] {targetApp.Url} is down.");
+            Console.WriteLine("E-posta gönderilirken bir hata oluştu: " + ex.Message);
         }
-    }
 
-    private async Task SendEmail(string to, string subject, string body)
-    {
-        var message = new MimeMessage();
-        message.From.Add(new MailboxAddress("Ariana", "arianaswan003@gmail.com"));
-        message.To.Add(new MailboxAddress("", to));
-        message.Subject = subject;
-
-        message.Body = new TextPart("plain")
-        {
-            Text = body
-        };
-
-        using (var client = new SmtpClient())
-        {
-            await client.ConnectAsync("smtp.gmail.com", 587, false);
-            await client.AuthenticateAsync("Ariana", "arianaswan003@gmail.com");
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
-        }
     }
 }
